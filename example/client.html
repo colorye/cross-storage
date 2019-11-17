@@ -1,0 +1,14 @@
+<!doctype html>
+<head>
+  <title>Cross Storage Client</title>
+</head>
+<body>
+  <script type="text/javascript">
+    import crossStorage from '../src';
+    await crossStorage.connect('http://localhost:3000');
+
+    await crossStorage.setItem('newKey', 'hello cross-storage');
+    console.log(await crossStorage.getItem('new-key'));
+  </script>
+</body>
+</html>

@@ -4,6 +4,8 @@
   "description": "Access localStorage from other domain you've owned.",
   "main": "index.js",
   "scripts": {
+    "build": "babel src -d dist && yarn min",
+    "min": "terser dist/index.js --compress --mangle --module --output dist/index.min.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
@@ -19,6 +21,14 @@
   "author": "ryenguyen7411",
   "license": "ISC",
   "dependencies": {
-    "shortid": "^2.2.15"
+    "nanoid": "^2.1.7"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.7.0",
+    "@babel/core": "^7.7.2",
+    "@babel/plugin-proposal-class-properties": "^7.7.0",
+    "@babel/plugin-transform-modules-commonjs": "^7.7.0",
+    "@babel/preset-env": "^7.7.1",
+    "terser": "^4.4.0"
   }
 }
