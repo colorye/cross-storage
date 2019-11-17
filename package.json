@@ -1,0 +1,24 @@
+{
+  "name": "@colorye/cross-storage",
+  "version": "0.1.0",
+  "description": "Access localStorage from other domain you've owned.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "cross",
+    "storage",
+    "postMessage",
+    "shared",
+    "storage",
+    "cross",
+    "shared",
+    "share"
+  ],
+  "author": "ryenguyen7411",
+  "license": "ISC",
+  "dependencies": {
+    "shortid": "^2.2.15"
+  }
+}
