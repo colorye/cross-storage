@@ -1,6 +1,6 @@
 {
   "name": "@colorye/cross-storage",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Access localStorage from other domain you've owned.",
   "main": "index.js",
   "scripts": {
@@ -18,8 +18,13 @@
     "shared",
     "share"
   ],
-  "author": "ryenguyen7411",
+  "author": "ryenguyen7411 <ryenguyen7411@gmail.com>",
   "license": "ISC",
+  "homepage": "https://github.com/colorye/cross-storage",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/colorye/cross-storage.git"
+  },
   "dependencies": {
     "nanoid": "^2.1.7"
   },
