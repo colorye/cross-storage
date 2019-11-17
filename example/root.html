@@ -1,0 +1,14 @@
+<!doctype html>
+<head>
+  <title>Cross Storage Root</title>
+</head>
+<body>
+  <script>
+    async function test() {
+      const crossStorage = require('../src');
+      await crossStorage.open('http://localhost:3001');
+    }
+    test()
+  </script>
+</body>
+</html>
