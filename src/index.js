@@ -57,14 +57,19 @@ class CrossStorage {
     return window.localStorage.getItem(key);
   };
   __setItem = function({ key, value }) {
-    window.localStorage.setItem(key, value);
+    return window.localStorage.setItem(key, value);
   };
   __removeItem = function({ key }) {
-    window.localStorage.removeItem(key);
+    return window.localStorage.removeItem(key);
   };
 
   /** For CLIENT */
-  connect = function(rootDomain, { frameId = "cross-storage", callback }) {
+  connect = function(rootDomain, { frameId = "cross-storage", callback } = {}) {
+    if (this.__connectionStatus === "CONNECTED") {
+      typeof callback === "function" && callback(this);
+      return this;
+    }
+
     let frame = document.getElementById(frameId);
     if (frame)
       return console.error(
@@ -125,10 +130,10 @@ class CrossStorage {
     return this.__request("getItem", { key });
   };
   setItem = function(key, value) {
-    this.__request("setItem", { key, value });
+    return this.__request("setItem", { key, value });
   };
   removeItem = function(key) {
-    this.__request("removeItem", { key });
+    return this.__request("removeItem", { key });
   };
   __request = function(method, params) {
     if (this.__connectionStatus !== "CONNECTED") {

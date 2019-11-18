@@ -80,21 +80,25 @@ var CrossStorage = function CrossStorage() {
   _defineProperty(this, "__setItem", function (_ref2) {
     var key = _ref2.key,
         value = _ref2.value;
-    window.localStorage.setItem(key, value);
+    return window.localStorage.setItem(key, value);
   });
 
   _defineProperty(this, "__removeItem", function (_ref3) {
     var key = _ref3.key;
-    window.localStorage.removeItem(key);
+    return window.localStorage.removeItem(key);
   });
 
-  _defineProperty(this, "__requests", {});
-
-  _defineProperty(this, "connect", function (rootDomain, frameId) {
+  _defineProperty(this, "connect", function (rootDomain, _temp) {
     var _this2 = this;
 
-    if (frameId === void 0) {
-      frameId = "cross-storage";
+    var _ref4 = _temp === void 0 ? {} : _temp,
+        _ref4$frameId = _ref4.frameId,
+        frameId = _ref4$frameId === void 0 ? "cross-storage" : _ref4$frameId,
+        callback = _ref4.callback;
+
+    if (this.__connectionStatus === "CONNECTED") {
+      typeof callback === "function" && callback(this);
+      return this;
     }
 
     var frame = document.getElementById(frameId);
@@ -131,6 +135,8 @@ var CrossStorage = function CrossStorage() {
     return new Promise(function (resolve) {
       _this2.__frame.onload = function () {
         _this2.__connectionStatus = "CONNECTED";
+        _this2.__requests = {};
+        typeof callback === "function" && callback(_this2);
         resolve(_this2);
       };
     });
@@ -154,14 +160,14 @@ var CrossStorage = function CrossStorage() {
   });
 
   _defineProperty(this, "setItem", function (key, value) {
-    this.__request("setItem", {
+    return this.__request("setItem", {
       key: key,
       value: value
     });
   });
 
   _defineProperty(this, "removeItem", function (key) {
-    this.__request("removeItem", {
+    return this.__request("removeItem", {
       key: key
     });
   });
