@@ -2,21 +2,16 @@
   "name": "@colorye/cross-storage",
   "version": "0.1.2",
   "description": "Access localStorage from other domain you've owned.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "build": "babel src -d dist && yarn min",
     "min": "terser dist/index.js --compress --mangle --module --output dist/index.min.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [
-    "cross",
-    "storage",
+    "cross-storage",
     "postMessage",
-    "shared",
-    "storage",
-    "cross",
-    "shared",
-    "share"
+    "shared"
   ],
   "author": "ryenguyen7411 <ryenguyen7411@gmail.com>",
   "license": "ISC",
