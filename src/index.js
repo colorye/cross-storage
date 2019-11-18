@@ -27,7 +27,7 @@ class CrossStorage {
           const method = req.method.split("CrossStorage:")[1];
           return JSON.stringify({
             id: req.id,
-            result: this[`__${method}`](req.params)
+            result: localStorage[method](...req.params)
           });
         } catch (err) {
           return JSON.stringify({
@@ -52,15 +52,6 @@ class CrossStorage {
     } else {
       window.detachEvent("onmessage", this.__rootListener);
     }
-  };
-  __getItem = function({ key }) {
-    return window.localStorage.getItem(key);
-  };
-  __setItem = function({ key, value }) {
-    return window.localStorage.setItem(key, value);
-  };
-  __removeItem = function({ key }) {
-    return window.localStorage.removeItem(key);
   };
 
   /** For CLIENT */
@@ -127,13 +118,13 @@ class CrossStorage {
     }
   };
   getItem = function(key) {
-    return this.__request("getItem", { key });
+    return this.__request("getItem", [key]);
   };
   setItem = function(key, value) {
-    return this.__request("setItem", { key, value });
+    return this.__request("setItem", [key, value]);
   };
   removeItem = function(key) {
-    return this.__request("removeItem", { key });
+    return this.__request("removeItem", [key]);
   };
   __request = function(method, params) {
     if (this.__connectionStatus !== "CONNECTED") {

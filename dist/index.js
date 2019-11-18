@@ -20,8 +20,6 @@ var CrossStorage = function CrossStorage() {
     }
 
     this.__rootListener = function (message) {
-      var _this = this;
-
       var origin = message.origin === "null" ? "file://" : message.origin;
       var isAllowed = allowedDomains.some(function (regx) {
         if (!regx instanceof RegExp) return false;
@@ -41,10 +39,12 @@ var CrossStorage = function CrossStorage() {
 
       var res = function () {
         try {
+          var _localStorage;
+
           var method = req.method.split("CrossStorage:")[1];
           return JSON.stringify({
             id: req.id,
-            result: _this["__" + method](req.params)
+            result: (_localStorage = localStorage)[method].apply(_localStorage, req.params)
           });
         } catch (err) {
           return JSON.stringify({
@@ -72,29 +72,13 @@ var CrossStorage = function CrossStorage() {
     }
   });
 
-  _defineProperty(this, "__getItem", function (_ref) {
-    var key = _ref.key;
-    return window.localStorage.getItem(key);
-  });
-
-  _defineProperty(this, "__setItem", function (_ref2) {
-    var key = _ref2.key,
-        value = _ref2.value;
-    return window.localStorage.setItem(key, value);
-  });
-
-  _defineProperty(this, "__removeItem", function (_ref3) {
-    var key = _ref3.key;
-    return window.localStorage.removeItem(key);
-  });
-
   _defineProperty(this, "connect", function (rootDomain, _temp) {
-    var _this2 = this;
+    var _this = this;
 
-    var _ref4 = _temp === void 0 ? {} : _temp,
-        _ref4$frameId = _ref4.frameId,
-        frameId = _ref4$frameId === void 0 ? "cross-storage" : _ref4$frameId,
-        callback = _ref4.callback;
+    var _ref = _temp === void 0 ? {} : _temp,
+        _ref$frameId = _ref.frameId,
+        frameId = _ref$frameId === void 0 ? "cross-storage" : _ref$frameId,
+        callback = _ref.callback;
 
     if (this.__connectionStatus === "CONNECTED") {
       typeof callback === "function" && callback(this);
@@ -133,11 +117,11 @@ var CrossStorage = function CrossStorage() {
     }
 
     return new Promise(function (resolve) {
-      _this2.__frame.onload = function () {
-        _this2.__connectionStatus = "CONNECTED";
-        _this2.__requests = {};
-        typeof callback === "function" && callback(_this2);
-        resolve(_this2);
+      _this.__frame.onload = function () {
+        _this.__connectionStatus = "CONNECTED";
+        _this.__requests = {};
+        typeof callback === "function" && callback(_this);
+        resolve(_this);
       };
     });
   });
@@ -154,26 +138,19 @@ var CrossStorage = function CrossStorage() {
   });
 
   _defineProperty(this, "getItem", function (key) {
-    return this.__request("getItem", {
-      key: key
-    });
+    return this.__request("getItem", [key]);
   });
 
   _defineProperty(this, "setItem", function (key, value) {
-    return this.__request("setItem", {
-      key: key,
-      value: value
-    });
+    return this.__request("setItem", [key, value]);
   });
 
   _defineProperty(this, "removeItem", function (key) {
-    return this.__request("removeItem", {
-      key: key
-    });
+    return this.__request("removeItem", [key]);
   });
 
   _defineProperty(this, "__request", function (method, params) {
-    var _this3 = this;
+    var _this2 = this;
 
     if (this.__connectionStatus !== "CONNECTED") {
       return console.error("ERROR: CrossStorage has not been up yet.");
@@ -185,20 +162,20 @@ var CrossStorage = function CrossStorage() {
       params: params
     };
     return new Promise(function (resolve, reject) {
-      _this3.__timeout = setTimeout(function () {
-        if (!_this3.__requests[req.id]) return;
-        delete _this3.__requests[req.id];
+      _this2.__timeout = setTimeout(function () {
+        if (!_this2.__requests[req.id]) return;
+        delete _this2.__requests[req.id];
         reject(new Error("timeout"));
       }, 5000);
 
-      _this3.__requests[req.id] = function (err, result) {
-        clearTimeout(_this3.__timeout);
-        delete _this3.__requests[req.id];
+      _this2.__requests[req.id] = function (err, result) {
+        clearTimeout(_this2.__timeout);
+        delete _this2.__requests[req.id];
         if (err) return reject(new Error(err));
         resolve(result);
       };
 
-      _this3.__frame.contentWindow.postMessage(JSON.stringify(req), _this3.__frame.src);
+      _this2.__frame.contentWindow.postMessage(JSON.stringify(req), _this2.__frame.src);
     }).catch(function (e) {
       console.error("ERROR: ", e);
     });
