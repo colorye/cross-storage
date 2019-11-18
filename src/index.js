@@ -27,7 +27,7 @@ class CrossStorage {
           const method = req.method.split("CrossStorage:")[1];
           return JSON.stringify({
             id: req.id,
-            result: this[`__${method}`](req.params)
+            result: localStorage[method](...req.params)
           });
         } catch (err) {
           return JSON.stringify({
@@ -52,15 +52,6 @@ class CrossStorage {
     } else {
       window.detachEvent("onmessage", this.__rootListener);
     }
-  };
-  __getItem = function({ key }) {
-    return window.localStorage.getItem(key);
-  };
-  __setItem = function({ key, value }) {
-    return window.localStorage.setItem(key, value);
-  };
-  __removeItem = function({ key }) {
-    return window.localStorage.removeItem(key);
   };
 
   /** For CLIENT */
@@ -111,6 +102,40 @@ class CrossStorage {
       this.__frame.onload = () => {
         this.__connectionStatus = "CONNECTED";
         this.__requests = {};
+        this.__request = function(method, params) {
+          if (this.__connectionStatus !== "CONNECTED") {
+            return console.error("ERROR: CrossStorage has not been up yet.");
+          }
+
+          const req = {
+            id: nanoId(SEED, 10),
+            method: "CrossStorage:" + method,
+            params
+          };
+
+          return new Promise((resolve, reject) => {
+            this.__timeout = setTimeout(() => {
+              if (!this.__requests[req.id]) return;
+              delete this.__requests[req.id];
+              reject(new Error("timeout"));
+            }, 5000);
+
+            this.__requests[req.id] = (err, result) => {
+              clearTimeout(this.__timeout);
+              delete this.__requests[req.id];
+              if (err) return reject(new Error(err));
+              resolve(result);
+            };
+
+            this.__frame.contentWindow.postMessage(
+              JSON.stringify(req),
+              this.__frame.src
+            );
+          }).catch(function(e) {
+            console.error("ERROR: ", e);
+          });
+        };
+
         typeof callback === "function" && callback(this);
         resolve(this);
       };
@@ -127,46 +152,13 @@ class CrossStorage {
     }
   };
   getItem = function(key) {
-    return this.__request("getItem", { key });
+    return this.__request("getItem", [key]);
   };
   setItem = function(key, value) {
-    return this.__request("setItem", { key, value });
+    return this.__request("setItem", [key, value]);
   };
   removeItem = function(key) {
-    return this.__request("removeItem", { key });
-  };
-  __request = function(method, params) {
-    if (this.__connectionStatus !== "CONNECTED") {
-      return console.error("ERROR: CrossStorage has not been up yet.");
-    }
-
-    const req = {
-      id: nanoId(SEED, 10),
-      method: "CrossStorage:" + method,
-      params
-    };
-
-    return new Promise((resolve, reject) => {
-      this.__timeout = setTimeout(() => {
-        if (!this.__requests[req.id]) return;
-        delete this.__requests[req.id];
-        reject(new Error("timeout"));
-      }, 5000);
-
-      this.__requests[req.id] = (err, result) => {
-        clearTimeout(this.__timeout);
-        delete this.__requests[req.id];
-        if (err) return reject(new Error(err));
-        resolve(result);
-      };
-
-      this.__frame.contentWindow.postMessage(
-        JSON.stringify(req),
-        this.__frame.src
-      );
-    }).catch(function(e) {
-      console.error("ERROR: ", e);
-    });
+    return this.__request("removeItem", [key]);
   };
 }
 
