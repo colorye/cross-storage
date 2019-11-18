@@ -64,8 +64,7 @@ class CrossStorage {
   };
 
   /** For CLIENT */
-  __requests = {};
-  connect = function(rootDomain, frameId = "cross-storage") {
+  connect = function(rootDomain, { frameId = "cross-storage", callback }) {
     let frame = document.getElementById(frameId);
     if (frame)
       return console.error(
@@ -106,6 +105,8 @@ class CrossStorage {
     return new Promise(resolve => {
       this.__frame.onload = () => {
         this.__connectionStatus = "CONNECTED";
+        this.__requests = {};
+        typeof callback === "function" && callback(this);
         resolve(this);
       };
     });
