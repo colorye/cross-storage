@@ -14,7 +14,7 @@
     "shared"
   ],
   "author": "ryenguyen7411 <ryenguyen7411@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "homepage": "https://github.com/colorye/cross-storage",
   "repository": {
     "type": "git",
