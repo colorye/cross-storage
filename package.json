@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "babel src -d dist && yarn min",
-    "min": "terser dist/index.js --compress --mangle --module --output dist/index.min.js",
+    "min": "terser dist/index.js --compress --mangle --mangle-props regex=/^__/,reserved=[__esModule] --module --output dist/index.min.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

@@ -1,5 +1,5 @@
 import "babel-polyfill";
-import crossStorage from "../dist";
+import crossStorage from "../dist/index.js";
 
 async function callback(storage) {
   await storage.setItem("hello", "world");

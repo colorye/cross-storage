@@ -120,6 +120,39 @@ var CrossStorage = function CrossStorage() {
       _this.__frame.onload = function () {
         _this.__connectionStatus = "CONNECTED";
         _this.__requests = {};
+
+        _this.__request = function (method, params) {
+          var _this2 = this;
+
+          if (this.__connectionStatus !== "CONNECTED") {
+            return console.error("ERROR: CrossStorage has not been up yet.");
+          }
+
+          var req = {
+            id: (0, _generate.default)(SEED, 10),
+            method: "CrossStorage:" + method,
+            params: params
+          };
+          return new Promise(function (resolve, reject) {
+            _this2.__timeout = setTimeout(function () {
+              if (!_this2.__requests[req.id]) return;
+              delete _this2.__requests[req.id];
+              reject(new Error("timeout"));
+            }, 5000);
+
+            _this2.__requests[req.id] = function (err, result) {
+              clearTimeout(_this2.__timeout);
+              delete _this2.__requests[req.id];
+              if (err) return reject(new Error(err));
+              resolve(result);
+            };
+
+            _this2.__frame.contentWindow.postMessage(JSON.stringify(req), _this2.__frame.src);
+          }).catch(function (e) {
+            console.error("ERROR: ", e);
+          });
+        };
+
         typeof callback === "function" && callback(_this);
         resolve(_this);
       };
@@ -147,38 +180,6 @@ var CrossStorage = function CrossStorage() {
 
   _defineProperty(this, "removeItem", function (key) {
     return this.__request("removeItem", [key]);
-  });
-
-  _defineProperty(this, "__request", function (method, params) {
-    var _this2 = this;
-
-    if (this.__connectionStatus !== "CONNECTED") {
-      return console.error("ERROR: CrossStorage has not been up yet.");
-    }
-
-    var req = {
-      id: (0, _generate.default)(SEED, 10),
-      method: "CrossStorage:" + method,
-      params: params
-    };
-    return new Promise(function (resolve, reject) {
-      _this2.__timeout = setTimeout(function () {
-        if (!_this2.__requests[req.id]) return;
-        delete _this2.__requests[req.id];
-        reject(new Error("timeout"));
-      }, 5000);
-
-      _this2.__requests[req.id] = function (err, result) {
-        clearTimeout(_this2.__timeout);
-        delete _this2.__requests[req.id];
-        if (err) return reject(new Error(err));
-        resolve(result);
-      };
-
-      _this2.__frame.contentWindow.postMessage(JSON.stringify(req), _this2.__frame.src);
-    }).catch(function (e) {
-      console.error("ERROR: ", e);
-    });
   });
 };
 

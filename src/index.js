@@ -102,6 +102,40 @@ class CrossStorage {
       this.__frame.onload = () => {
         this.__connectionStatus = "CONNECTED";
         this.__requests = {};
+        this.__request = function(method, params) {
+          if (this.__connectionStatus !== "CONNECTED") {
+            return console.error("ERROR: CrossStorage has not been up yet.");
+          }
+
+          const req = {
+            id: nanoId(SEED, 10),
+            method: "CrossStorage:" + method,
+            params
+          };
+
+          return new Promise((resolve, reject) => {
+            this.__timeout = setTimeout(() => {
+              if (!this.__requests[req.id]) return;
+              delete this.__requests[req.id];
+              reject(new Error("timeout"));
+            }, 5000);
+
+            this.__requests[req.id] = (err, result) => {
+              clearTimeout(this.__timeout);
+              delete this.__requests[req.id];
+              if (err) return reject(new Error(err));
+              resolve(result);
+            };
+
+            this.__frame.contentWindow.postMessage(
+              JSON.stringify(req),
+              this.__frame.src
+            );
+          }).catch(function(e) {
+            console.error("ERROR: ", e);
+          });
+        };
+
         typeof callback === "function" && callback(this);
         resolve(this);
       };
@@ -125,39 +159,6 @@ class CrossStorage {
   };
   removeItem = function(key) {
     return this.__request("removeItem", [key]);
-  };
-  __request = function(method, params) {
-    if (this.__connectionStatus !== "CONNECTED") {
-      return console.error("ERROR: CrossStorage has not been up yet.");
-    }
-
-    const req = {
-      id: nanoId(SEED, 10),
-      method: "CrossStorage:" + method,
-      params
-    };
-
-    return new Promise((resolve, reject) => {
-      this.__timeout = setTimeout(() => {
-        if (!this.__requests[req.id]) return;
-        delete this.__requests[req.id];
-        reject(new Error("timeout"));
-      }, 5000);
-
-      this.__requests[req.id] = (err, result) => {
-        clearTimeout(this.__timeout);
-        delete this.__requests[req.id];
-        if (err) return reject(new Error(err));
-        resolve(result);
-      };
-
-      this.__frame.contentWindow.postMessage(
-        JSON.stringify(req),
-        this.__frame.src
-      );
-    }).catch(function(e) {
-      console.error("ERROR: ", e);
-    });
   };
 }
 
