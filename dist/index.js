@@ -7,6 +7,8 @@ exports.default = void 0;
 
 var _generate = _interopRequireDefault(require("nanoid/generate"));
 
+var _jsCookie = _interopRequireDefault(require("js-cookie"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
@@ -39,12 +41,13 @@ var CrossStorage = function CrossStorage() {
 
       var res = function () {
         try {
-          var _localStorage;
-
           var method = req.method.split("CrossStorage:")[1];
+          var func = localStorage[method];
+          if (typeof func !== 'function') func = _jsCookie.default[method];
+          if (typeof func !== 'function') throw new Error(method + " is not a valid function.");
           return JSON.stringify({
             id: req.id,
-            result: (_localStorage = localStorage)[method].apply(_localStorage, req.params)
+            result: func.apply(void 0, req.params)
           });
         } catch (err) {
           return JSON.stringify({
@@ -180,6 +183,18 @@ var CrossStorage = function CrossStorage() {
 
   _defineProperty(this, "removeItem", function (key) {
     return this.__request("removeItem", [key]);
+  });
+
+  _defineProperty(this, "getCookie", function (key) {
+    return this.__request("get", [key]);
+  });
+
+  _defineProperty(this, "setCookie", function (key, value) {
+    return this.__request("set", [key, value]);
+  });
+
+  _defineProperty(this, "removeCookie", function (key) {
+    return this.__request("remove", [key]);
   });
 };
 

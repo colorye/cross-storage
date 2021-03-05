@@ -1,4 +1,5 @@
 import nanoId from "nanoid/generate";
+import cookies from 'js-cookie';
 
 const SEED = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
@@ -25,9 +26,13 @@ class CrossStorage {
       const res = (() => {
         try {
           const method = req.method.split("CrossStorage:")[1];
+          let func = localStorage[method];
+          if (typeof func !== 'function') func = cookies[method];
+          if (typeof func !== 'function') throw new Error(`${method} is not a valid function.`);
+
           return JSON.stringify({
             id: req.id,
-            result: localStorage[method](...req.params)
+            result: func(...req.params)
           });
         } catch (err) {
           return JSON.stringify({
@@ -159,6 +164,15 @@ class CrossStorage {
   };
   removeItem = function(key) {
     return this.__request("removeItem", [key]);
+  };
+  getCookie = function(key) {
+    return this.__request("get", [key]);
+  };
+  setCookie = function(key, value) {
+    return this.__request("set", [key, value]);
+  };
+  removeCookie = function(key) {
+    return this.__request("remove", [key]);
   };
 }
 
