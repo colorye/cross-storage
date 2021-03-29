@@ -26,18 +26,19 @@ class CrossStorage {
       const res = (() => {
         try {
           const method = req.method.split("CrossStorage:")[1];
-          let func = localStorage[method];
-          if (typeof func !== 'function') func = cookies[method];
-          if (typeof func !== 'function') throw new Error(`${method} is not a valid function.`);
-
+          let result = (() => {
+            // dynamic set func = localStorage[method] and func(...req.params) will cause error
+            if (typeof localStorage[method] === 'function') return localStorage[method](...req.params);
+            if (typeof cookies[method] === 'function') return cookies[method](...req.params);
+          })();
           return JSON.stringify({
             id: req.id,
-            result: func(...req.params)
+            result,
           });
         } catch (err) {
           return JSON.stringify({
             id: req.id,
-            error: err
+            error: err,
           });
         }
       })();
@@ -89,7 +90,7 @@ class CrossStorage {
           return JSON.parse(message.data);
         } catch (err) {}
       })();
-      if (!res.id || typeof this.__requests[res.id] !== "function") return;
+      if (!res || !res.id || typeof this.__requests[res.id] !== "function") return;
       this.__requests[res.id](res.error, res.result);
     };
 

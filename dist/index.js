@@ -42,12 +42,18 @@ var CrossStorage = function CrossStorage() {
       var res = function () {
         try {
           var method = req.method.split("CrossStorage:")[1];
-          var func = localStorage[method];
-          if (typeof func !== 'function') func = _jsCookie.default[method];
-          if (typeof func !== 'function') throw new Error(method + " is not a valid function.");
+
+          var result = function () {
+            var _localStorage;
+
+            // dynamic set func = localStorage[method] and func(...req.params) will cause error
+            if (typeof localStorage[method] === 'function') return (_localStorage = localStorage)[method].apply(_localStorage, req.params);
+            if (typeof _jsCookie.default[method] === 'function') return _jsCookie.default[method].apply(_jsCookie.default, req.params);
+          }();
+
           return JSON.stringify({
             id: req.id,
-            result: func.apply(void 0, req.params)
+            result: result
           });
         } catch (err) {
           return JSON.stringify({
