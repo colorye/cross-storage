@@ -90,7 +90,7 @@ class CrossStorage {
           return JSON.parse(message.data);
         } catch (err) {}
       })();
-      if (!res.id || typeof this.__requests[res.id] !== "function") return;
+      if (!res || !res.id || typeof this.__requests[res.id] !== "function") return;
       this.__requests[res.id](res.error, res.result);
     };
 
