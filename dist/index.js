@@ -114,7 +114,7 @@ var CrossStorage = function CrossStorage() {
         } catch (err) {}
       }();
 
-      if (!res.id || typeof this.__requests[res.id] !== "function") return;
+      if (!res || !res.id || typeof this.__requests[res.id] !== "function") return;
 
       this.__requests[res.id](res.error, res.result);
     };
