@@ -27,9 +27,22 @@ class CrossStorage {
         try {
           const method = req.method.split("CrossStorage:")[1];
           let result = (() => {
-            // dynamic set func = localStorage[method] and func(...req.params) will cause error
-            if (typeof localStorage[method] === 'function') return localStorage[method](...req.params);
-            if (typeof cookies[method] === 'function') return cookies[method](...req.params);
+            switch (method) {
+              case 'getItem':
+                return localStorage.getItem(...req.params);
+              case 'setItem':
+                return localStorage.setItem(...req.params);
+              case 'removeItem':
+                return localStorage.removeItem(...req.params);
+              case 'getCookie':
+                return cookies.get(...req.params);
+              case 'setCookie':
+                return cookies.set(...req.params);
+              case 'removeCookie':
+                return cookies.remove(...req.params);
+              default:
+                return;
+            }
           })();
           return JSON.stringify({
             id: req.id,
@@ -167,13 +180,13 @@ class CrossStorage {
     return this.__request("removeItem", [key]);
   };
   getCookie = function(key) {
-    return this.__request("get", [key]);
+    return this.__request("getCookie", [key]);
   };
   setCookie = function(key, value) {
-    return this.__request("set", [key, value]);
+    return this.__request("setCookie", [key, value]);
   };
   removeCookie = function(key) {
-    return this.__request("remove", [key]);
+    return this.__request("removeCookie", [key]);
   };
 }
 

@@ -44,11 +44,30 @@ var CrossStorage = function CrossStorage() {
           var method = req.method.split("CrossStorage:")[1];
 
           var result = function () {
-            var _localStorage;
+            var _localStorage, _localStorage2, _localStorage3;
 
-            // dynamic set func = localStorage[method] and func(...req.params) will cause error
-            if (typeof localStorage[method] === 'function') return (_localStorage = localStorage)[method].apply(_localStorage, req.params);
-            if (typeof _jsCookie.default[method] === 'function') return _jsCookie.default[method].apply(_jsCookie.default, req.params);
+            switch (method) {
+              case 'getItem':
+                return (_localStorage = localStorage).getItem.apply(_localStorage, req.params);
+
+              case 'setItem':
+                return (_localStorage2 = localStorage).setItem.apply(_localStorage2, req.params);
+
+              case 'removeItem':
+                return (_localStorage3 = localStorage).removeItem.apply(_localStorage3, req.params);
+
+              case 'getCookie':
+                return _jsCookie.default.get.apply(_jsCookie.default, req.params);
+
+              case 'setCookie':
+                return _jsCookie.default.set.apply(_jsCookie.default, req.params);
+
+              case 'removeCookie':
+                return _jsCookie.default.remove.apply(_jsCookie.default, req.params);
+
+              default:
+                return;
+            }
           }();
 
           return JSON.stringify({
@@ -192,15 +211,15 @@ var CrossStorage = function CrossStorage() {
   });
 
   _defineProperty(this, "getCookie", function (key) {
-    return this.__request("get", [key]);
+    return this.__request("getCookie", [key]);
   });
 
   _defineProperty(this, "setCookie", function (key, value) {
-    return this.__request("set", [key, value]);
+    return this.__request("setCookie", [key, value]);
   });
 
   _defineProperty(this, "removeCookie", function (key) {
-    return this.__request("remove", [key]);
+    return this.__request("removeCookie", [key]);
   });
 };
 
