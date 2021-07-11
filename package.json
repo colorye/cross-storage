@@ -1,6 +1,6 @@
 {
   "name": "@colorye/cross-storage",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Access localStorage from other domain you've owned.",
   "main": "dist/index.js",
   "scripts": {

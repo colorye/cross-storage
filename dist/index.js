@@ -152,21 +152,29 @@ var CrossStorage = function CrossStorage() {
               res = {
                 id: req.id
               };
+              _context2.prev = 8;
+              _context2.next = 11;
+              return regeneratorRuntime.awrap(handleRequest(req.method, req.params));
 
-              try {
-                res.result = handleRequest(req.method, req.params);
-              } catch (err) {
-                res.error = err;
-              }
+            case 11:
+              res.result = _context2.sent;
+              _context2.next = 17;
+              break;
 
+            case 14:
+              _context2.prev = 14;
+              _context2.t0 = _context2["catch"](8);
+              res.error = _context2.t0;
+
+            case 17:
               window.parent.postMessage(JSON.stringify(res), origin);
 
-            case 10:
+            case 18:
             case "end":
               return _context2.stop();
           }
         }
-      }, null, null, null, Promise);
+      }, null, null, [[8, 14]], Promise);
     };
 
     if (window.addEventListener) {
