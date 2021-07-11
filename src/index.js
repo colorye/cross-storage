@@ -56,7 +56,7 @@ class CrossStorage {
 
       const res = { id: req.id };
       try {
-        res.result = handleRequest(req.method, req.params);
+        res.result = await handleRequest(req.method, req.params);
       } catch (err) {
         res.error = err;
       }
