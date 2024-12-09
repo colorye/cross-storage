@@ -23,7 +23,7 @@
   "dependencies": {
     "idb": "6.1.2",
     "js-cookie": "2.2.1",
-    "nanoid": "2.1.7"
+    "nanoid": "3.3.8"
   },
   "devDependencies": {
     "@babel/cli": "7.7.0",
